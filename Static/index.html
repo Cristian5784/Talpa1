@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gioco della Talpa</title>
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+  <div id="menu">
+    <h1>Gioco della Talpa</h1>
+    <button id="start-button">Inizia il Gioco</button>
+  </div>
+
+  <div id="game-container" class="hidden">
+    <h2>Punteggio: <span id="score">0</span></h2>
+    <h2>Tempo rimasto: <span id="timer">30</span> secondi</h2>
+    <div id="grid">
+    </div>
+    <button id="restart-button" class="hidden">Ricomincia</button>
+  </div>
+
+  <script>
+    const menu = document.getElementById('menu');
+    const startButton = document.getElementById('start-button');
+    const gameContainer = document.getElementById('game-container');
+    const grid = document.getElementById('grid');
+    const scoreSpan = document.getElementById('score');
+    const timerSpan = document.getElementById('timer');
+    const restartButton = document.getElementById('restart-button');
+
+    let score = 0;
+    let activeCell = null;
+    let gameInterval;
+    let timerInterval;
+    let timeLeft = 30;
+
+    startButton.addEventListener('click', () => {
+      menu.classList.add('hidden');
+      gameContainer.classList.remove('hidden');
+      startGame();
+    });
+
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      updateScore();
+      updateTimer();
+      generateGrid();
+      gameInterval = setInterval(moveMole, 1000);
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function generateGrid() {
+      grid.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.addEventListener('click', () => hitMole(cell));
+        grid.appendChild(cell);
+      }
+    }
+
+    function moveMole() {
+      if (activeCell) {
+        activeCell.classList.remove('active');
+      }
+      const cells = document.querySelectorAll('.cell');
+      const randomIndex = Math.floor(Math.random() * cells.length);
+      activeCell = cells[randomIndex];
+      activeCell.classList.add('active');
+    }
+
+    function hitMole(cell) {
+      if (cell === activeCell) {
+        score++;
+        updateScore();
+        activeCell.classList.remove('active');
+        activeCell = null;
+      }
+    }
+
+    function updateScore() {
+      scoreSpan.textContent = score;
+    }
+
+    function updateTimer() {
+      timeLeft--;
+      timerSpan.textContent = timeLeft;
+
+      if (timeLeft <= 0) {
+        endGame();
+      }
+    }
+
+    function endGame() {
+      clearInterval(gameInterval);
+      clearInterval(timerInterval);
+      alert(`Tempo scaduto! Il tuo punteggio finale è: ${score}`);
+      gameContainer.classList.add('hidden');
+      menu.classList.remove('hidden');
+    }
+
+    restartButton.addEventListener('click', () => {
+      clearInterval(gameInterval);
+      clearInterval(timerInterval);
+      gameContainer.classList.add('hidden');
+      menu.classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
